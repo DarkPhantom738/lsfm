@@ -15,4 +15,5 @@ code/results/*/*.tfm
 code/results/*/*/*.nii.gz
 code/results/**/metrics*.json
 code/results/**/setup.json
+code/results/**/fields.npz
 .ipynb_checkpoints/

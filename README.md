@@ -193,7 +193,31 @@ and gives high discord to the affected part of the graph.
 
 ![BigStitcher controlled bad-overlap result: coordinate methods and node discord](code/results/bigstitcher_validation/coordinate_comparison_fault.png)
 
-### 4. Compact numerical view of the coordinate improvements
+### 4. Exploratory local-deformation sheaf
+
+This is a deliberately controlled test of the proposed extension beyond one
+translation per image. A public BigStitcher microscopy projection is made into
+three locally warped, noisy observations. Patch phase correlation estimates a
+local displacement at 49 overlap locations per image pair. Each image then
+carries a 7 × 7 displacement-control field; the restriction maps sample each
+field in the physical overlap patch before comparing it with its neighbour.
+
+The global-translation baseline compresses the same local measurements to one
+shift per image. On this test, control-field MAE is **0.704 px** for the
+translation baseline and **0.183 px** for the deformation sheaf. Fusing the
+corrected observations gives MAE **0.0231 → 0.0135** and SSIM **0.821 →
+0.939**.
+
+![Controlled public-microscopy local-warp test: translation baseline versus local deformation sheaf](code/results/deformation_sheaf_validation/comparison.png)
+
+For a separate local-fault check, eight overlap-patch measurements were
+corrupted. At a fixed top-10% residual no-call rate, the residual map recovered
+**87.5%** of those corrupted patches; its no-call precision was **46.7%** versus
+a 5.4% corrupted-patch prevalence. This is mechanism evidence only: the local
+warps are synthetic, the public source is microscopy rather than LSFM, and this
+is not yet a comparison with a conventional nonrigid-registration method.
+
+### 5. Compact numerical view of the coordinate improvements
 
 The following figure puts the three coordinate/reconstruction comparisons on
 their own appropriate scales. The two RMSE panels are lower-is-better; the NCC
@@ -275,6 +299,9 @@ MPLBACKEND=Agg .venv/bin/python code/make_figures.py
 # Real-overlap graph and fault-QC visualizations.
 MPLBACKEND=Agg .venv/bin/python code/bigstitcher_validation.py
 MPLBACKEND=Agg .venv/bin/python code/bigstitcher_validation.py --inject-fault
+
+# Controlled local-deformation reconstruction test on a public tile.
+MPLBACKEND=Agg .venv/bin/python code/deformation_sheaf_validation.py
 
 # Held-section cortical-layer proxy.
 MPLBACKEND=Agg .venv/bin/python code/cortical_layer_proxy.py

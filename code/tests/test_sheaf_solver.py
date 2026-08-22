@@ -6,7 +6,17 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from sheaf_solver import CoordinateSheaf, CoordinateSheafEdge, CorticalBoundarySheaf, SheafEdge, ordered_projection, registration_reliability
+from sheaf_solver import (
+    CoordinateSheaf,
+    CoordinateSheafEdge,
+    CorticalBoundarySheaf,
+    DeformationFieldSheaf,
+    DeformationSheafEdge,
+    SheafEdge,
+    bilinear_restriction,
+    ordered_projection,
+    registration_reliability,
+)
 
 
 class GlassTests(unittest.TestCase):
@@ -71,6 +81,23 @@ class GlassTests(unittest.TestCase):
             np.zeros_like(truth), variance, robust_scale=0.25, robust_iterations=20
         )
         self.assertLess(np.sqrt(np.mean((robust - truth) ** 2)), np.sqrt(np.mean((quadratic - truth) ** 2)))
+
+    def test_deformation_sheaf_recovers_nonconstant_overlap_field(self):
+        shape = (2, 2)
+        field_dimension = 8
+        points = np.array(((0.0, 0.0), (0.0, 1.0), (1.0, 0.0), (1.0, 1.0)))
+        restriction = bilinear_restriction(shape, points)
+        truth = np.array([
+            np.zeros(field_dimension),
+            np.array((0.0, 0.0, 1.0, -1.0, -1.0, 1.0, 2.0, 0.5)),
+        ])
+        relative = restriction @ truth[1] - restriction @ truth[0]
+        edge = DeformationSheafEdge(0, 1, 1.0, restriction, restriction, relative)
+        mean = np.zeros_like(truth)
+        variance = np.full_like(truth, 1e5)
+        variance[0] = 1e-6
+        estimate, _, _ = DeformationFieldSheaf(2, shape, [edge]).solve(mean, variance)
+        self.assertLess(np.max(np.abs(estimate - truth)), 1e-3)
 
 
 if __name__ == "__main__":
