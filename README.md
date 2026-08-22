@@ -217,7 +217,26 @@ a 5.4% corrupted-patch prevalence. This is mechanism evidence only: the local
 warps are synthetic, the public source is microscopy rather than LSFM, and this
 is not yet a comparison with a conventional nonrigid-registration method.
 
-### 5. Compact numerical view of the coordinate improvements
+### 5. Actual-overlap check: no demonstrated deformation gain yet
+
+To avoid treating the controlled warp result as real-data validation, I also
+used four *raw* BigStitcher confocal tiles and sampled phase-correlation shifts
+from their true physical overlap regions. Each overlap was split into 60% train,
+20% development, and 20% untouched test patches; the development split selected
+the deformation-field smoothness. The test target is held-out local-shift
+agreement, not an unavailable deformation ground truth.
+
+On this small, mostly rigid dataset, the deformation sheaf **did not improve**
+the held-out result: mean residual was **3.566 px** (median **0.839 px**), versus
+**3.555 px** (median **0.809 px**) for the one-translation-per-tile baseline.
+That is a useful negative result: this dataset does not support a claim that the
+method improves real nonrigid registration. It instead shows that the method
+needs evaluation on LSFM data with genuine local deformation and independent
+landmarks or annotations.
+
+![Held-out residuals from actual raw BigStitcher overlap patches; lower is better](code/results/actual_overlap_deformation_validation/heldout_residuals.png)
+
+### 6. Compact numerical view of the coordinate improvements
 
 The following figure puts the three coordinate/reconstruction comparisons on
 their own appropriate scales. The two RMSE panels are lower-is-better; the NCC
@@ -302,6 +321,9 @@ MPLBACKEND=Agg .venv/bin/python code/bigstitcher_validation.py --inject-fault
 
 # Controlled local-deformation reconstruction test on a public tile.
 MPLBACKEND=Agg .venv/bin/python code/deformation_sheaf_validation.py
+
+# Held-out check on actual raw BigStitcher overlap patches.
+MPLBACKEND=Agg .venv/bin/python code/actual_overlap_deformation_validation.py
 
 # Held-section cortical-layer proxy.
 MPLBACKEND=Agg .venv/bin/python code/cortical_layer_proxy.py
